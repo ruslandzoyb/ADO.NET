@@ -20,12 +20,21 @@ namespace PL
 
             
            ProductGateWay gateWay = new ProductGateWay(connectionString);
-            gateWay.Create(new ADO_Lib.Models.Product()
-                { Name = "Jacobs",
-                Price = 10 }
-            );
+            /* gateWay.Create(new ADO_Lib.Models.Product()
+                 { Name = "Jacobs",
+                 Price = 10 }
+             );*/
+            //  var pr = gateWay.Get(5);
+            //Console.WriteLine($"{pr.Id}  {pr.Name}  {pr.Price}  ");
 
-
+            var cl = gateWay.GetProviderByCat(new ADO_Lib.Models.Category()
+            {
+                Name = "Laptop"
+            });
+            foreach (var item in cl)
+            {
+                Console.WriteLine($"{item.Id} {item.Name} {item.City} ");
+            }
             Console.ReadLine();
         }
     }

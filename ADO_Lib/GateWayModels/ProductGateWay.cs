@@ -35,29 +35,100 @@ namespace ADO_Lib.GateWayModels
 
         public void Delete(int? id)
         {
-            throw new NotImplementedException();
-        }
+            string query = $"DELETE FROM PRODUCTS WHERE Id={id} ;";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                reader.Read();
+            }
+            }
 
         public IEnumerable<Product> Find(Func<Product, bool> predicate)
         {
             throw new NotImplementedException();
         }
+        public IEnumerable<Product> GetByCategory(Category category)
+        {
+            string query = $"SELECT * FROM PRODUCTS WHERE CategoryId=(SELECT DISTINCT Id FROM CATEGORIES WHERE Name='{category.Name}')";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                List<Product> products = new List<Product>();
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    int id = reader.GetInt32(0);
+                    string name = reader.GetString(1);
+                    int price = reader.GetInt32(2);
+                    int catid = reader.GetInt32(3);
+                    products.Add(new Product()
+                    {
+                        Id = id,
+                        Name = name,
+                        Price = price
+
+
+                    });
+
+                }
+                return products;
+
+            }
+            }
+        public IEnumerable<Provider> GetProviderByCat(Category category)
+        {
+            string query = $"SELECT PT.ProviderID, PR.Name, PR.City  from Products as PT  join Providers as PR  on PT.ProviderID = PR.Id   where PT.CategoryID = (SELECT DISTINCT Id FROM CATEGORIES WHERE Categories.Name = '{category.Name}' ) ";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                List<Provider> providers = new List<Provider>();
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    int id = reader.GetInt32(0);
+                    string name = reader.GetString(1);
+                    string city = reader.GetString(2);
+                    providers.Add(new Provider()
+                    {
+                        Id = id,
+                        Name = name,
+                        City = city
+                    });
+
+                }
+                return providers;
+            }
+        }
 
         public Product Get(int? id)
         {
-            throw new NotImplementedException();
-        }
+            string query = $" SELECT * FROM PRODUCTS WHERE Id={id} ";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                Product product = new Product();
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    product.Id = reader.GetInt32(0);
+                    product.Name = reader.GetString(1);
+                    product.Price = reader.GetInt32(2);
+                    
+                }
+                return product;
+            }
+            
+            }
+
+        public IEnumerable<Product>
 
         public IEnumerable<Product> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(Product item)
-        {
-            throw new NotImplementedException();
-        }
-        public void R()
         {
             string query = "SELECT * FROM PRODUCTS;";
             //string query = "INSERT INTO PRODUCTS (Name, Price, CategoryID, ProviderID ) VALUES('@item.Name', '@item.Price' ,'@item.Category.Id' ,'')";
@@ -83,11 +154,14 @@ namespace ADO_Lib.GateWayModels
 
                     });
                 }
-                foreach (var it in products)
-                {
-                    Console.WriteLine($"{it.Id}  {it.Name} {it.Price}");
-                }
+                return products;
             }
         }
+
+        public void Update(Product item)
+        {
+            throw new NotImplementedException();
+        }
+        
     }
 }
