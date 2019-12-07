@@ -104,7 +104,21 @@ namespace ADO_Lib.GateWayModels
                 return providers;
             }
         }
-
+        public void GetAmountUnCateg()
+        {
+            string query = "select  pr.Name  ,Count(DISTINCT  ctg.Name) as Uniq from Products   as ps join Categories as ctg on ps.CategoryID = ctg.Id join  Providers as pr on ps.ProviderID = pr.Id  group by pr.Name";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+               
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    Console.WriteLine($" Provider {reader.GetString(0)} Amount of catagories {reader.GetInt32(1)} ");
+                }
+            }
+        }
         public Product Get(int? id)
         {
             string query = $" SELECT * FROM PRODUCTS WHERE Id={id} ";
@@ -126,8 +140,43 @@ namespace ADO_Lib.GateWayModels
             
             }
 
-        public IEnumerable<Product>
+        public IEnumerable<Product> GetByProvider(Provider provider)
+        {
+            string query = $"SELECT * FROM PRODUCTS WHERE ProviderId=(SELECT DISTINCT Id FROM Providers WHERE Name='{provider.Name}')";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                List<Product> products = new List<Product>();
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    int id = reader.GetInt32(0);
+                    string name = reader.GetString(1);
+                    int price = reader.GetInt32(2);
+                    Category category = new Category()
+                    {
+                        Id = reader.GetInt32(3)
+                    };
 
+
+                    products.Add(new Product()
+                    {
+                        Id = id,
+                        Name = name,
+                        Price = price,
+                        Category = new Category()
+                        {
+                            Id = id
+                        }
+
+                    });
+
+
+                }
+                return products;
+            }
+        }
         public IEnumerable<Product> GetAll()
         {
             string query = "SELECT * FROM PRODUCTS;";
