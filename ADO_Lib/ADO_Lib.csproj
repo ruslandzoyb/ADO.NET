@@ -41,7 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GateWayModels\CategoryGateWay.cs" />
     <Compile Include="GateWayModels\ProductGateWay.cs" />
+    <Compile Include="GateWayModels\ProviderGateWay.cs" />
     <Compile Include="Interface\IGateWay.cs" />
     <Compile Include="Models\Category.cs" />
     <Compile Include="Models\Product.cs" />

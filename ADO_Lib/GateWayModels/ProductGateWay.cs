@@ -79,46 +79,8 @@ namespace ADO_Lib.GateWayModels
 
             }
             }
-        public IEnumerable<Provider> GetProviderByCat(Category category)
-        {
-            string query = $"SELECT PT.ProviderID, PR.Name, PR.City  from Products as PT  join Providers as PR  on PT.ProviderID = PR.Id   where PT.CategoryID = (SELECT DISTINCT Id FROM CATEGORIES WHERE Categories.Name = '{category.Name}' ) ";
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                List<Provider> providers = new List<Provider>();
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    int id = reader.GetInt32(0);
-                    string name = reader.GetString(1);
-                    string city = reader.GetString(2);
-                    providers.Add(new Provider()
-                    {
-                        Id = id,
-                        Name = name,
-                        City = city
-                    });
-
-                }
-                return providers;
-            }
-        }
-        public void GetAmountUnCateg()
-        {
-            string query = "select  pr.Name  ,Count(DISTINCT  ctg.Name) as Uniq from Products   as ps join Categories as ctg on ps.CategoryID = ctg.Id join  Providers as pr on ps.ProviderID = pr.Id  group by pr.Name";
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-               
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    Console.WriteLine($" Provider {reader.GetString(0)} Amount of catagories {reader.GetInt32(1)} ");
-                }
-            }
-        }
+      
+       
         public Product Get(int? id)
         {
             string query = $" SELECT * FROM PRODUCTS WHERE Id={id} ";
@@ -209,8 +171,17 @@ namespace ADO_Lib.GateWayModels
 
         public void Update(Product item)
         {
-            throw new NotImplementedException();
-        }
+            string query = $"UPDATE PRODUCTS SET Name='{item.Name}' ,Price='{item.Price}' ,CategoryID='{item.Category.Id}' WHERE Id='{item.Id}' ";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                reader.Read();
+                
+            }
+
+            }
         
     }
 }
